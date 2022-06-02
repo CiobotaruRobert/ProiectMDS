@@ -1,112 +1,143 @@
 package com.example.proiect;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Menu;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import com.example.proiect.ui.login.LoginViewModel;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.navigation.NavigationView;
+
+import androidx.annotation.NonNull;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.proiect.databinding.ActivityMainBinding;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-public class RegisterActivity extends AppCompatActivity {
-
-
+public class MainActivity extends AppCompatActivity {
+    ListView listView;
+    String[] name = {"Abcde","Abcrehm","jytjtn"};
+    ArrayAdapter<String> arrayAdapter;
+    private AppBarConfiguration mAppBarConfiguration;
+    private ActivityMainBinding binding;
     private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_register);
+
 
         mAuth = FirebaseAuth.getInstance();
-        if (mAuth.getCurrentUser() != null) {
-            finish();
-            return;
-        }
+        super.onCreate(savedInstanceState);
+
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+
+        setContentView(binding.getRoot());
+       //logoutUser();
 
 
-        TextView textViewSwitchToLogin = findViewById(R.id.switchtologinbutton);
-        textViewSwitchToLogin.setOnClickListener(new View.OnClickListener() {
+        setSupportActionBar(binding.appBarMain.toolbar);
+        binding.appBarMain.logoutbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                switchToLogin();
+                if(mAuth.getCurrentUser()==null)
+                {
+                Intent intent = new Intent (view.getContext(), LoginActivity.class);
+                startActivity(intent);
+                finish();
+                }
+                else
+                {
+                    logoutUser();
+                }
+
+
             }
+
+
         });
+        DrawerLayout drawer = binding.drawerLayout;
+        NavigationView navigationView = binding.navView;
+        mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_login,R.id.nav_register,R.id.nav_contact,R.id.nav_bug_report)
+                .setOpenableLayout(drawer)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, navController);
+
+        listView=findViewById(R.id.listview);
+        arrayAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,name);
+        listView.setAdapter(arrayAdapter);
+
+        //if(mAuth.getCurrentUser()!=null)
+        //{
+        //    TextView textView = (TextView) findViewById(R.id.email_textview);
+        //    EditText etEmail = findViewById(R.id.email);
+        //    String email = etEmail.getText().toString();
+        //    textView.setText(email);
+        //}
+
+    }
 
 
-        Button btnRegister = findViewById(R.id.registerbutton);
-        btnRegister.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+
+        getMenuInflater().inflate(R.menu.search_menu, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setQueryHint("Type here to search");
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onClick(View view) {
-                registerUser();
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                arrayAdapter.getFilter().filter(newText);
+
+
+                return false;
             }
         });
+        return true;
     }
 
-    private void registerUser() {
-        EditText etUsername = findViewById(R.id.username);
-        EditText etEmail = findViewById(R.id.email);
-        EditText etPassword = findViewById(R.id.password);
-        EditText etRepeatPassword = findViewById(R.id.repeat_password);
-
-        String email = etEmail.getText().toString();
-        String username = etUsername.getText().toString();
-        String password = etPassword.getText().toString();
-        String repeat_password = etRepeatPassword.getText().toString();
-
-        if (username.isEmpty() || password.isEmpty() || repeat_password.isEmpty() || email.isEmpty()) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        if (!password.equals(repeat_password)) {
-            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            User user = new User(username, email);
-                            FirebaseDatabase.getInstance().getReference("users")
-                                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                    .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    showMainActivity();
-                                    setContentView(R.layout.activity_main);
-                                }
-                            });
-                        } else {
-                            Toast.makeText(RegisterActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-    }
-        private void showMainActivity(){
-            Intent intent = new Intent (this,MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
-        private void switchToLogin(){
-            Intent intent = new Intent (this, LoginActivity.class);
-            startActivity(intent);
-            finish();
-        }
+    private void logoutUser() {
+        FirebaseAuth.getInstance().signOut();
+        //Intent intent = new Intent(this, LoginActivity.class);
+        //startActivity(intent);
+        //finish();
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
+                || super.onSupportNavigateUp();
+    }
 
-
-
+}
