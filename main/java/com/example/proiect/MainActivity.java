@@ -1,16 +1,19 @@
 package com.example.proiect;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 
-import com.example.proiect.ui.login.LoginViewModel;
+
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
@@ -21,6 +24,8 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proiect.databinding.ActivityMainBinding;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,6 +36,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
     ListView listView;
     String[] name = {"Abcde","Abcrehm","jytjtn"};
@@ -38,47 +45,79 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
     private FirebaseAuth mAuth;
+    private RecyclerView recyclerView;
+    private ArrayList<Feed> arrayList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         mAuth = FirebaseAuth.getInstance();
         super.onCreate(savedInstanceState);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
 
         setContentView(binding.getRoot());
+       //logoutUser();
+
 
 
         setSupportActionBar(binding.appBarMain.toolbar);
         binding.appBarMain.logoutbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mAuth.getCurrentUser()==null){
+                if(mAuth.getCurrentUser()==null)
+                {
                 Intent intent = new Intent (view.getContext(), LoginActivity.class);
                 startActivity(intent);
-                finish();}
+                finish();
+                }
                 else
                 {
                     logoutUser();
                 }
+
+
             }
+
 
         });
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow)
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.nav_login,R.id.nav_register,R.id.nav_contact,R.id.nav_bug_report)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        listView=findViewById(R.id.listview);
-        arrayAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,name);
-        listView.setAdapter(arrayAdapter);
+//        listView=findViewById(R.id.listview);
+//        arrayAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,name);
+//        listView.setAdapter(arrayAdapter);
 
+        //if(mAuth.getCurrentUser()!=null)
+        //{
+        //    TextView textView = (TextView) findViewById(R.id.email_textview);
+        //    EditText etEmail = findViewById(R.id.email);
+        //    String email = etEmail.getText().toString();
+        //    textView.setText(email);
+        //}
+
+                arrayList=new ArrayList<>();
+        recyclerView=findViewById(R.id.recyclerView);
+
+        arrayList.add(new Feed(R.drawable.cat2,R.drawable.cat,"Titlu","Mesaj"));
+        arrayList.add(new Feed(R.drawable.ic_launcher_background,R.drawable.cat,"Titlu","Mesaj"));
+        arrayList.add(new Feed(R.drawable.ic_launcher_background,R.drawable.cat,"Titlu","Mesaj"));
+        arrayList.add(new Feed(R.drawable.ic_launcher_background,R.drawable.cat,"Titlu","Mesaj"));
+        arrayList.add(new Feed(R.drawable.ic_launcher_background,R.drawable.cat,"Titlu","Mesaj"));
+        arrayList.add(new Feed(R.drawable.ic_launcher_background,R.drawable.cat,"Titlu","Mesaj"));
+
+
+        RecyclerAdapter recyclerAdapter = new RecyclerAdapter(arrayList);
+        recyclerView.setAdapter(recyclerAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
     }
 
