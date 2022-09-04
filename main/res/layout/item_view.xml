@@ -71,6 +71,18 @@
         app:layout_constraintTop_toBottomOf="@+id/ivPost"
         android:padding="10dp"
         app:layout_constraintStart_toStartOf="parent"
+        android:onClick="metoda_like"
+        />
+    <TextView
+        android:id="@+id/like_counter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/ivPost"
+        app:layout_constraintStart_toEndOf="@+id/ivLike"
+        android:padding="5dp"
+        android:text="0"
         />
     <ImageButton
         android:id="@+id/ivComment"
@@ -79,8 +91,10 @@
         android:src="@drawable/ic_baseline_message_24"
         app:layout_constraintTop_toBottomOf="@+id/ivPost"
         android:padding="10dp"
-        app:layout_constraintStart_toEndOf="@+id/ivLike"
+        app:layout_constraintStart_toEndOf="@+id/like_counter"
+        android:onClick="metoda_comment"
         />
+
     <ImageButton
         android:id="@+id/ivShare"
         android:layout_width="wrap_content"
@@ -89,6 +103,7 @@
         android:padding="10dp"
         app:layout_constraintStart_toEndOf="@+id/ivComment"
         android:src="@drawable/ic_baseline_share_24"
+        android:onClick="metoda_share"
         />
     <ImageButton
         android:id="@+id/ivBookmark"
@@ -98,6 +113,7 @@
         app:layout_constraintTop_toBottomOf="@+id/ivPost"
         android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
+        android:onClick="metoda_bookmark"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
