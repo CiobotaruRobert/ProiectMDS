@@ -25,6 +25,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_NAME_2 = "user";
     private static final String COLUMN_ID_2 = "id";
     private static final String COLUMN_USER_KEY = "cheie";
+    private static final String COLUMN_USERNAME="username";
+    private static final String COLUMN_IMAGINE_PROFIL_BLOB="imagine_profil";
 
     private static final String TABLE_NAME_BOOKMARKS = "bookmarks";
     private static final String COLUMN_ID_TABEL_BOOKMARKS = "id_bookmark";
@@ -35,6 +37,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_ID_TABEL_UNIQUE_LIKES="id_like";
     private static final String COLUMN_ID_POSTARE_UNIQUE_LIKES="id_postare";
     private final static String COLUMN_CHEIE_USER_UNIQUE_LIKES="cheie_user";
+
+    private static final String TABLE_NAME_COMMENTS="comments";
+    private static final String COLUMN_ID_TABEL_COMMENTS="id";
+    private static final String COLUMN_ID_POSTARE_COMMENTS_TABLE = "id_postare";
+    private static final String COLUMN_TABEL_COMMENTS_MESSAGE="mesaj";
+    private static final String COLUMN_TABEL_COMMENTS_DATA_POSTARE="data";
+    private static final String COLUMN_TABEL_COMMENTS_USER="username";
+    private static final String COLUMN_TABEL_COMMENTS_POSTER_KEY="cheie_postator";
 
     public DatabaseHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -54,7 +64,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String query2 = "CREATE TABLE " + TABLE_NAME_2 +
                 " (" + COLUMN_ID_2 + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
-                COLUMN_USER_KEY + " TEXT);";
+                COLUMN_USER_KEY + " TEXT, " +
+                COLUMN_USERNAME + " TEXT, " +
+                COLUMN_IMAGINE_PROFIL_BLOB + " BLOB "+");";
         db.execSQL(query2);
 
         String query3 = "CREATE TABLE " + TABLE_NAME_BOOKMARKS +
@@ -68,6 +80,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_ID_POSTARE_UNIQUE_LIKES + " INTEGER, "+
                 COLUMN_CHEIE_USER_UNIQUE_LIKES + " TEXT);";
         db.execSQL(query4);
+
+        String query5= "CREATE TABLE " + TABLE_NAME_COMMENTS +
+                " (" + COLUMN_ID_TABEL_COMMENTS + " INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                COLUMN_ID_POSTARE_COMMENTS_TABLE + " INTEGER, "+
+                COLUMN_TABEL_COMMENTS_MESSAGE + " TEXT, "+
+                COLUMN_TABEL_COMMENTS_DATA_POSTARE + " TEXT, "+
+                COLUMN_TABEL_COMMENTS_USER + " TEXT, "+
+                COLUMN_TABEL_COMMENTS_POSTER_KEY + " TEXT);";
+        db.execSQL(query5);
     }
 
     @Override
@@ -76,6 +97,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_2);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_BOOKMARKS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_UNIQUE_LIKES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_COMMENTS);
         onCreate(db);
     }
 
@@ -99,6 +121,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return cursor;
     }
+    Cursor get_profile_image_post(String id_aux) {
+        String query = "SELECT " + COLUMN_IMAGINE_PROFIL_BLOB + " FROM " + TABLE_NAME_2+" WHERE "+ COLUMN_USER_KEY + " = "+ "'"+id_aux+"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        if (db != null) {
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+    Cursor get_owner_user_key(int id_aux) {
+        String query = "SELECT " + COLUMN_POST_OWNER_KEY + " FROM " + TABLE_NAME +" WHERE "+ COLUMN_ID +" = " + id_aux;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        if (db != null) {
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+
 
     Cursor get_my_posts(String aux){
         String query="SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_POST_OWNER_KEY + " = " + "'"+ aux +"'";
@@ -110,17 +151,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    void insert_user_key(String cheie){
+    void insert_user_key(String cheie, String nume_utilizator,byte[] barray){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_USER_KEY,cheie);
+        cv.put(COLUMN_USERNAME,nume_utilizator);
+        cv.put(COLUMN_IMAGINE_PROFIL_BLOB, barray);
         long result = db.insert(TABLE_NAME_2,null,cv);
-        if(result==-1){
-            Toast.makeText(context,"Nu a reusit adaugarea cheii",Toast.LENGTH_SHORT).show();
-        }
-        else {
-            Toast.makeText(context,"CHEIE adaugata cu succes",Toast.LENGTH_SHORT).show();
-        }
         }
 
 
@@ -261,6 +298,50 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return result.getInt(0);
         else
             return 0;
+    }
+
+    Cursor readMessagesFromCommentsTable(int id_postare){
+        String query = "SELECT mesaj,data,username,cheie_postator FROM " + TABLE_NAME_COMMENTS + " WHERE " + COLUMN_ID_POSTARE_COMMENTS_TABLE + " = " + id_postare;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor=null;
+        if (db!=null){
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+    void PostComment(int id_postare, String mesaj, String data_comment,String username, String cheie_aux){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("INSERT INTO comments(id_postare,mesaj,data,username,cheie_postator) VALUES (" +id_postare+","+"'"+mesaj+"'"+","+"'"+data_comment+"'"+","+"'"+username+"'" + ","+"'"+cheie_aux+"'" +");");
+    }
+
+    Cursor get_current_username(String aux){
+        String query="SELECT username FROM " + TABLE_NAME_2 + " WHERE " + COLUMN_USER_KEY + " = " + "'"+ aux +"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        if(db!=null){
+            cursor=db.rawQuery(query,null);
+        }
+        return cursor;
+    }
+    Cursor get_current_user_id(String aux){
+        String query="SELECT id FROM " + TABLE_NAME_2 + " WHERE " + COLUMN_USER_KEY + " = " + "'"+ aux +"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        if(db!=null){
+            cursor=db.rawQuery(query,null);
+        }
+        return cursor;
+    }
+    Cursor get_imagine_profil(String cheie_user)
+    {
+        String query="SELECT " + COLUMN_IMAGINE_PROFIL_BLOB + " FROM " + TABLE_NAME_2 + " WHERE " + COLUMN_USER_KEY + " = " + "'"+ cheie_user +"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        if(db!=null){
+            cursor=db.rawQuery(query,null);
+        }
+        return cursor;
     }
 
 }
