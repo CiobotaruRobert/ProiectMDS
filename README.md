@@ -1,4 +1,4 @@
-# Cooking app
+# Recipe Haven
 ## Team members:
 Ciobotaru Robert
 Ghidarcea Tudor-Alexandru
