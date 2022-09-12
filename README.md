@@ -13,7 +13,7 @@ Application demo can be found [here]():
 We used Trello for our backlog and task organisation during the development of the application. Those can be found [here](https://trello.com/b/Gij4q9zE/mds).
 
 ## UML Use Case Diagram
-(ss ul cu diagrama)
+![](diagrama.png?raw=true)
 
 ## Source control
 This can be seen on the project's commit history, [here](https://github.com/CiobotaruRobert/ProiectMDS/commits/main).
