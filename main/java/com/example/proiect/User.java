@@ -10,4 +10,19 @@ public class User {
         this.username=username;
         this.email=email;
     }
+    String getUsername(){
+        return username;
+    }
+    String getEmail(){
+        return email;
+    }
+    public void setUsername(String username)
+    {
+        this.username = username;
+    }
+    public void setEmail(String email)
+    {
+        this.email = email;
+    }
+
 }
