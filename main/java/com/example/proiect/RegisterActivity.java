@@ -89,12 +89,12 @@ public class RegisterActivity extends AppCompatActivity {
                             FirebaseDatabase.getInstance().getReference("users")
                                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                     .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    showMainActivity();
-                                    setContentView(R.layout.activity_main);
-                                }
-                            });
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            showMainActivity();
+                                            setContentView(R.layout.activity_main);
+                                        }
+                                    });
                         } else {
                             Toast.makeText(RegisterActivity.this, "Authentication failed.",
                                     Toast.LENGTH_LONG).show();
@@ -102,16 +102,16 @@ public class RegisterActivity extends AppCompatActivity {
                     }
                 });
     }
-        private void showMainActivity(){
-            Intent intent = new Intent (this,MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
-        private void switchToLogin(){
-            Intent intent = new Intent (this, LoginActivity.class);
-            startActivity(intent);
-            finish();
-        }
+    private void showMainActivity(){
+        Intent intent = new Intent (this,MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+    private void switchToLogin(){
+        Intent intent = new Intent (this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
 
     public void buttonUpload(View view){
         Intent galleryIntent=new Intent(Intent.ACTION_PICK);
@@ -137,8 +137,4 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    }
-
-
-
-
+}

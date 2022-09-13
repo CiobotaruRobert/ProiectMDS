@@ -2,22 +2,10 @@ package com.example.proiect;
 
 public class ModelComment {
 
-    String cId;
-
     String comment;
     String ptime;
-
-
-
-    String udp;
-
-    public String getcId() {
-        return cId;
-    }
-
-    public void setcId(String cId) {
-        this.cId = cId;
-    }
+    String uname;
+    String uid;
 
     public String getComment() {
         return comment;
@@ -35,21 +23,6 @@ public class ModelComment {
         this.ptime = ptime;
     }
 
-    public String getUdp() {
-        return udp;
-    }
-
-    public void setUdp(String udp) {
-        this.udp = udp;
-    }
-
-    public String getUemail() {
-        return uemail;
-    }
-
-    public void setUemail(String uemail) {
-        this.uemail = uemail;
-    }
 
     public String getUid() {
         return uid;
@@ -67,13 +40,9 @@ public class ModelComment {
         this.uname = uname;
     }
 
-    String uemail;
 
     public ModelComment() {
     }
-
-
-    String uid;
 
     public ModelComment( String comment, String ptime, String uid, String uname) {
         this.comment = comment;
@@ -81,6 +50,4 @@ public class ModelComment {
         this.uid = uid;
         this.uname = uname;
     }
-
-    String uname;
 }
