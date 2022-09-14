@@ -8,7 +8,7 @@
 ## Application description:
 The project is an application that makes use of social media app elements in order to offer an online recipe sharing haven.
 ## Demo
-Application demo can be found [here]():
+Application demo can be found [here](https://youtu.be/0-iIG8yj_TU):
 ## User stories and backlog creation
 We used Trello for our backlog and task organisation during the development of the application. Those can be found [here](https://trello.com/b/Gij4q9zE/mds).
 
